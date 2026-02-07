@@ -1,0 +1,837 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>For You ❤️</title>
+  <meta name="description" content="An interactive memory book." />
+  <style>
+    :root{
+      --bg1:#0b1020;
+      --bg2:#100b1f;
+      --card: rgba(255,255,255,.08);
+      --card2: rgba(255,255,255,.12);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.68);
+      --accent: #ff5ea8;
+      --accent2:#7c5cff;
+      --ring: rgba(255,94,168,.35);
+      --shadow: 0 20px 80px rgba(0,0,0,.45);
+      --radius: 22px;
+      --radius2: 16px;
+      --max: 1040px;
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 15% 10%, rgba(255,94,168,.18), transparent 60%),
+        radial-gradient(1000px 700px at 85% 15%, rgba(124,92,255,.18), transparent 60%),
+        radial-gradient(900px 600px at 40% 85%, rgba(255,255,255,.06), transparent 55%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      overflow-x:hidden;
+    }
+
+    a{color:inherit}
+
+    .wrap{max-width:var(--max); margin:0 auto; padding:28px 18px 60px;}
+
+    header{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:14px; flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      user-select:none;
+    }
+    .heart{
+      width:38px; height:38px;
+      border-radius:12px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.35), transparent 45%),
+                  linear-gradient(135deg, rgba(255,94,168,.95), rgba(124,92,255,.9));
+      box-shadow: 0 16px 50px rgba(255,94,168,.15);
+      display:grid; place-items:center;
+      position:relative;
+      overflow:hidden;
+    }
+    .heart svg{filter: drop-shadow(0 8px 18px rgba(0,0,0,.35));}
+
+    .titleblock h1{margin:0; font-size:22px; letter-spacing:.2px;}
+    .titleblock p{margin:2px 0 0; color:var(--muted); font-size:13.5px;}
+
+    .controls{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+    .pill{
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+      padding:10px 12px;
+      border-radius:999px;
+      font-size:13px;
+      color:var(--muted);
+      display:flex; gap:8px; align-items:center;
+      box-shadow: 0 10px 30px rgba(0,0,0,.18);
+      backdrop-filter: blur(10px);
+    }
+    .pill input{
+      width:110px;
+      background: transparent;
+      border:none;
+      color:var(--text);
+      outline:none;
+      font-size:13px;
+    }
+    .btn{
+      appearance:none;
+      border:none;
+      border-radius:999px;
+      padding:10px 13px;
+      background: rgba(255,255,255,.10);
+      color:var(--text);
+      cursor:pointer;
+      border:1px solid rgba(255,255,255,.16);
+      box-shadow: 0 12px 40px rgba(0,0,0,.22);
+      transition: transform .12s ease, background .15s ease, border-color .15s ease;
+      backdrop-filter: blur(10px);
+      font-size:13px;
+      display:flex; align-items:center; gap:8px;
+    }
+    .btn:hover{transform: translateY(-1px); background: rgba(255,255,255,.13); border-color: rgba(255,255,255,.22)}
+    .btn:active{transform: translateY(0px) scale(.99)}
+
+    .hero{
+      margin-top:14px;
+      padding:18px;
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .hero::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background:
+        radial-gradient(600px 240px at 10% 20%, rgba(255,94,168,.22), transparent 60%),
+        radial-gradient(520px 240px at 90% 25%, rgba(124,92,255,.22), transparent 60%);
+      opacity:.9;
+      filter: blur(0px);
+      pointer-events:none;
+    }
+
+    .hero-inner{position:relative; display:grid; gap:12px;}
+    .hero h2{margin:0; font-size:22px; letter-spacing:.2px;}
+    .hero p{margin:0; color:var(--muted); line-height:1.45; max-width:70ch;}
+
+    .grid{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap:14px;
+    }
+
+    .card{
+      grid-column: span 12;
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+      transition: transform .18s ease, border-color .18s ease;
+      cursor:pointer;
+    }
+    .card:hover{transform: translateY(-3px); border-color: rgba(255,255,255,.22)}
+
+    .card .top{
+      padding:16px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      position:relative;
+      z-index:2;
+    }
+    .card .badge{
+      font-size:12px;
+      color: rgba(255,255,255,.78);
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.16);
+      padding:6px 10px;
+      border-radius:999px;
+      backdrop-filter: blur(8px);
+      display:inline-flex; gap:7px; align-items:center;
+    }
+
+    .card h3{margin:0 0 4px; font-size:18px; letter-spacing:.2px;}
+    .card p{margin:0; color:var(--muted); font-size:13.5px; line-height:1.45;}
+
+    .preview{
+      height:180px;
+      background:
+        radial-gradient(240px 180px at 20% 25%, rgba(255,255,255,.18), transparent 60%),
+        radial-gradient(260px 180px at 80% 30%, rgba(255,255,255,.12), transparent 62%),
+        linear-gradient(135deg, rgba(255,94,168,.55), rgba(124,92,255,.55));
+      position:relative;
+    }
+    .preview::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: linear-gradient(180deg, transparent 0%, rgba(11,16,32,.60) 80%, rgba(11,16,32,.92) 100%);
+    }
+
+    .card .bottom{
+      padding:16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      position:relative;
+      z-index:2;
+    }
+
+    .hint{
+      font-size:12.5px;
+      color: rgba(255,255,255,.74);
+      display:flex; align-items:center; gap:8px;
+    }
+
+    .mini-btn{
+      padding:9px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.10);
+      color:var(--text);
+      cursor:pointer;
+      font-size:13px;
+      display:flex; align-items:center; gap:8px;
+      transition: transform .12s ease;
+    }
+    .mini-btn:hover{transform: translateY(-1px)}
+
+    .two{
+      grid-column: span 12;
+    }
+
+    @media (min-width: 840px){
+      .two{grid-column: span 4;}
+      .titleblock h1{font-size:24px}
+      .hero h2{font-size:26px}
+      .preview{height:170px}
+    }
+
+    /* MODAL */
+    .overlay{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.58);
+      backdrop-filter: blur(10px);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index:50;
+    }
+    .overlay.show{display:flex;}
+
+    .modal{
+      width:min(980px, 100%);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.07));
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow: 0 30px 120px rgba(0,0,0,.55);
+      overflow:hidden;
+      position:relative;
+      transform: translateY(10px);
+      opacity:0;
+      transition: opacity .16s ease, transform .18s ease;
+    }
+    .overlay.show .modal{transform: translateY(0px); opacity:1;}
+
+    .modal-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      padding:16px;
+      border-bottom: 1px solid rgba(255,255,255,.14);
+    }
+    .modal-head h4{margin:0; font-size:18px}
+    .modal-head p{margin:4px 0 0; color:var(--muted); font-size:13.5px; line-height:1.45}
+
+    .close{
+      border:none;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.18);
+      color:var(--text);
+      border-radius:12px;
+      padding:10px 12px;
+      cursor:pointer;
+      transition: transform .12s ease;
+      display:flex; align-items:center; gap:8px;
+    }
+    .close:hover{transform: translateY(-1px)}
+
+    .modal-body{padding:16px; display:grid; gap:12px;}
+
+    .toolbar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      padding:12px;
+      border-radius: var(--radius2);
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.15);
+    }
+
+    .toolbar .left{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+    .toolbar .right{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+
+    .ghost{
+      background: transparent;
+      border: 1px solid rgba(255,255,255,.18);
+      color: var(--text);
+      padding:9px 12px;
+      border-radius: 999px;
+      cursor:pointer;
+    }
+
+    .counter{font-size:13px; color:var(--muted)}
+
+    .frame{
+      border-radius: var(--radius2);
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.35);
+      box-shadow: 0 14px 50px rgba(0,0,0,.35);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .bigimg{
+      width:100%;
+      height: min(70vh, 650px);
+      object-fit: contain;
+      display:block;
+      background: rgba(0,0,0,.25);
+    }
+
+    .thumbs{
+      display:flex;
+      gap:10px;
+      overflow:auto;
+      padding:12px;
+      border-top: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.14);
+    }
+
+    .thumb{
+      width:90px;
+      height:62px;
+      flex: 0 0 auto;
+      border-radius: 14px;
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+      cursor:pointer;
+      position:relative;
+      transition: transform .12s ease, border-color .12s ease;
+    }
+
+    .thumb img{width:100%; height:100%; object-fit: cover; display:block; opacity:.9}
+    .thumb:hover{transform: translateY(-1px); border-color: rgba(255,255,255,.28)}
+    .thumb[aria-current="true"]{outline: 3px solid var(--ring); border-color: rgba(255,94,168,.35)}
+
+    .note{
+      padding:14px;
+      border-radius: var(--radius2);
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.07);
+      color: rgba(255,255,255,.86);
+      line-height:1.55;
+      font-size:14px;
+    }
+
+    .sparkle{
+      position:absolute;
+      width:12px; height:12px;
+      background: rgba(255,255,255,.70);
+      border-radius: 999px;
+      filter: blur(0.2px);
+      opacity:.35;
+      animation: float 5.5s ease-in-out infinite;
+    }
+    .sparkle:nth-child(1){left:14%; top:12%; animation-delay:0s}
+    .sparkle:nth-child(2){left:64%; top:16%; animation-delay:1.3s}
+    .sparkle:nth-child(3){left:82%; top:52%; animation-delay:2.1s}
+    .sparkle:nth-child(4){left:22%; top:58%; animation-delay:2.7s}
+    .sparkle:nth-child(5){left:48%; top:76%; animation-delay:3.4s}
+
+    @keyframes float{
+      0%,100%{transform: translateY(0px) scale(1)}
+      50%{transform: translateY(-10px) scale(1.08)}
+    }
+
+    /* Accessibility helper */
+    .sr{position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="heart" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 21s-7-4.35-9.5-8.5C.1 8.7 2.2 5 6.2 5c2 0 3.3 1.1 3.8 2 0.5-0.9 1.8-2 3.8-2 4 0 6.1 3.7 3.7 7.5C19 16.65 12 21 12 21z" fill="rgba(255,255,255,.92)"/>
+          </svg>
+        </div>
+        <div class="titleblock">
+          <h1 id="pageTitle">For You ❤️</h1>
+          <p id="pageSub">Pick a memory. I saved these moments just for us.</p>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="pill" title="Optional: customize the header name">
+          <span style="opacity:.85">My love:</span>
+          <input id="nameInput" placeholder= "Alice" aria-label="Alice" />
+        </div>
+        <button class="btn" id="loveNoteBtn" type="button" aria-haspopup="dialog" aria-controls="overlay">
+          <span aria-hidden="true">💌</span>
+          Open love note
+        </button>
+      </div>
+    </header>
+
+    <section class="hero" aria-label="Intro">
+      <div class="hero-inner">
+        <div class="sparkle" aria-hidden="true"></div>
+        <div class="sparkle" aria-hidden="true"></div>
+        <div class="sparkle" aria-hidden="true"></div>
+        <div class="sparkle" aria-hidden="true"></div>
+        <div class="sparkle" aria-hidden="true"></div>
+
+        <h2>Choose a chapter of us ✨</h2>
+        <p>
+          I made this little website as a surprise — a place where you can tap into our favorite moments.
+          Pick one below to open a mini gallery and relive it.
+        </p>
+      </div>
+    </section>
+
+    <section class="grid" aria-label="Memory choices">
+      <!-- SUMMER -->
+      <article class="card two" role="button" tabindex="0" data-memory="summer" aria-label="Open Summer memory">
+        <div class="preview" style="background:
+          radial-gradient(260px 200px at 25% 25%, rgba(255,255,255,.20), transparent 60%),
+          radial-gradient(260px 200px at 80% 30%, rgba(255,255,255,.12), transparent 62%),
+          linear-gradient(135deg, rgba(0, 184, 255, .55), rgba(255, 196, 0, .45));
+        "></div>
+        <div class="top">
+          <div>
+            <h3>Summer</h3>
+            <p>Hot and tan in lake garda</p>
+          </div>
+          <div class="badge"><span aria-hidden="true">☀️</span> Tap to open</div>
+        </div>
+        <div class="bottom">
+          <div class="hint"><span aria-hidden="true">🌊</span> Sailors</div>
+          <button class="mini-btn" type="button" data-open="summer"><span aria-hidden="true">▶</span> View</button>
+        </div>
+      </article>
+
+      <!-- FALL -->
+      <article class="card two" role="button" tabindex="0" data-memory="fall" aria-label="Open Fall memory">
+        <div class="preview" style="background:
+          radial-gradient(240px 180px at 20% 25%, rgba(255,255,255,.18), transparent 60%),
+          radial-gradient(260px 180px at 80% 30%, rgba(255,255,255,.12), transparent 62%),
+          linear-gradient(135deg, rgba(255, 94, 168, .55), rgba(124,92,255,.55));
+        "></div>
+        <div class="top">
+          <div>
+            <h3>Fall</h3>
+            <p> Nyc with you</p>
+          </div>
+          <div class="badge"><span aria-hidden="true">🍂</span> Tap to open</div>
+        </div>
+        <div class="bottom">
+          <div class="hint"><span aria-hidden="true">☕</span> Cozy moments with Zia Maria</div>
+          <button class="mini-btn" type="button" data-open="fall"><span aria-hidden="true">▶</span> View</button>
+        </div>
+      </article>
+
+      <!-- WINTER -->
+      <article class="card two" role="button" tabindex="0" data-memory="winter" aria-label="Open Winter memory">
+        <div class="preview" style="background:
+          radial-gradient(240px 180px at 20% 25%, rgba(255,255,255,.18), transparent 60%),
+          radial-gradient(260px 180px at 80% 30%, rgba(255,255,255,.12), transparent 62%),
+          linear-gradient(135deg, rgba(0, 184, 255, .45), rgba(255,255,255,.20));
+        "></div>
+        <div class="top">
+          <div>
+            <h3>Winter</h3>
+            <p>il nostro primo natale insieme</p>
+          </div>
+          <div class="badge"><span aria-hidden="true">❄️</span> Tap to open</div>
+        </div>
+        <div class="bottom">
+          <div class="hint"><span aria-hidden="true">🧣</span> SPA day</div>
+          <button class="mini-btn" type="button" data-open="winter"><span aria-hidden="true">▶</span> View</button>
+        </div>
+      </article>
+    </section>
+
+    
+
+    <footer style="margin-top:22px; color:rgba(255,255,255,.62); font-size:13px;">
+      Made with love. Press <kbd style="padding:2px 6px; border-radius:8px; border:1px solid rgba(255,255,255,.16); background:rgba(0,0,0,.18)">Esc</kbd> to close a memory.
+    </footer>
+  </div>
+
+  <!-- LOVE NOTE OVERLAY (separate from memory modal) -->
+  <div class="overlay" id="loveOverlay" role="dialog" aria-modal="true" aria-labelledby="loveTitle" aria-hidden="true">
+    <div class="modal" role="document">
+      <div class="modal-head">
+        <div>
+          <h4 id="loveTitle">A little note ❤️</h4>
+          <p id="loveSubtitle"></p>
+        </div>
+        <button class="close" type="button" data-close="love">✕ Close</button>
+      </div>
+      <div class="modal-body">
+        <div class="note" id="loveNote"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MEMORY OVERLAY -->
+  <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal" role="document">
+      <div class="modal-head">
+        <div>
+          <h4 id="modalTitle">Memory</h4>
+          <p id="modalSubtitle">Click a photo below to switch. Use arrows or swipe.</p>
+        </div>
+        <button class="close" type="button" data-close="mem">✕ Close</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="toolbar">
+          <div class="left">
+            <button class="ghost" type="button" id="prevBtn" aria-label="Previous photo">← Prev</button>
+            <button class="ghost" type="button" id="nextBtn" aria-label="Next photo">Next →</button>
+          </div>
+          <div class="right">
+            <div class="counter" id="counter">0 / 0</div>
+          </div>
+        </div>
+
+        <div class="frame">
+          <img class="bigimg" id="bigimg" alt="Selected memory photo" />
+          <div class="thumbs" id="thumbs" aria-label="Thumbnails"></div>
+        </div>
+
+        <div class="note" id="caption"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================
+    // 1) CUSTOMIZE ME
+    // ==========================
+
+    // LOVE_NOTE: Personalize this message (she’ll see it when she clicks “Open love note”).
+    const LOVE_NOTE = `
+      <div style="font-size:15px;">
+        <p style="margin:0 0 10px;"><strong>Hey <span id=\"herNameInline\">patatina</span>,</strong></p>
+        <p style="margin:0 0 10px;">I made this little website because I wanted you to feel, even from far away, how much I love you.</p>
+        <p style="margin:0;">I wanted to suprise you this morning patatina❤️</p>
+        <p style="margin:12px 0 0; color:rgba(255,255,255,.75)">— Lorenzo</p>
+      </div>
+    `;
+
+    // Add captions (optional). The keys must match the memory ids: boat, nyc, xmas
+    // Captions can also include a "date" field if you want.
+    const MEMORY_META = {
+      summer: {
+        title: "Summer",
+        subtitle: "Golden days together.",
+        caption: "La nostra giornata in barca e' uno dei ricordi piu' belli della mia vita."
+      },
+      fall: {
+        title: "Fall",
+        subtitle: "Rooftop season.",
+        caption: "Non sai quanto ho apprezzato il fatto che tu sia venuta a trovarmi."
+      },
+      winter: {
+        title: "Winter",
+        subtitle: "Cold days, specialmente capodanno.",
+        caption: "Grazie per essere sempre al mio fianco"
+      }
+    };
+
+    // Define your images here.
+    // IMPORTANT: Put the actual files in /images and match these names.
+    // You can add more (boat-4.jpg, etc.).
+    const IMAGES = {
+      summer: [
+        "images/summer-1.jpg",
+        "images/summer-2.jpg",
+        "images/summer-3.jpg"
+      ],
+      fall: [
+        "images/fall-1.jpg",
+        "images/fall-2.jpg",
+        "images/fall-3.jpg"
+      ],
+      winter: [
+        "images/winter-1.jpg",
+        "images/winter-2.jpg",
+        "images/winter-3.jpg"
+      ]
+    };
+
+    // ==========================
+    // 2) APP LOGIC
+    // ==========================
+
+    const $ = (s, r=document) => r.querySelector(s);
+    const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+
+    const nameInput = $("#nameInput");
+    const pageTitle = $("#pageTitle");
+    const pageSub = $("#pageSub");
+
+    // Modal elements
+    const overlay = $("#overlay");
+    const modalTitle = $("#modalTitle");
+    const modalSubtitle = $("#modalSubtitle");
+    const bigimg = $("#bigimg");
+    const thumbs = $("#thumbs");
+    const caption = $("#caption");
+    const counter = $("#counter");
+    const prevBtn = $("#prevBtn");
+    const nextBtn = $("#nextBtn");
+
+    // Love note overlay
+    const loveOverlay = $("#loveOverlay");
+    const loveNote = $("#loveNote");
+
+    // State
+    let activeMemory = null;
+    let activeIndex = 0;
+
+    // Init love note
+    loveNote.innerHTML = LOVE_NOTE;
+
+    function currentHerName(){
+      const v = (nameInput.value || "").trim();
+      return v.length ? v : "love";
+    }
+
+    function syncHeader(){
+      const nm = currentHerName();
+      pageTitle.textContent = nm === "love" ? "For You ❤️" : `For ${nm} ❤️`;
+      pageSub.textContent = "Pick a memory. I saved these moments just for us.";
+      const inline = $("#herNameInline");
+      if(inline) inline.textContent = nm;
+    }
+
+    nameInput.addEventListener("input", syncHeader);
+    syncHeader();
+
+    function openLoveNote(){
+      loveOverlay.classList.add("show");
+      loveOverlay.setAttribute("aria-hidden", "false");
+      syncHeader();
+    }
+    function closeLoveNote(){
+      loveOverlay.classList.remove("show");
+      loveOverlay.setAttribute("aria-hidden", "true");
+    }
+
+    $("#loveNoteBtn").addEventListener("click", openLoveNote);
+    $$('[data-close="love"]').forEach(btn => btn.addEventListener("click", closeLoveNote));
+
+    function openMemory(mem){
+      activeMemory = mem;
+      activeIndex = 0;
+
+      const meta = MEMORY_META[mem] || {title:"Memory", subtitle:"", caption:""};
+      modalTitle.textContent = meta.title;
+      modalSubtitle.textContent = meta.subtitle || "";
+      caption.textContent = meta.caption || "";
+
+      buildThumbs();
+      showImage(0);
+
+      overlay.classList.add("show");
+      overlay.setAttribute("aria-hidden", "false");
+      // focus close button for accessibility
+      setTimeout(() => { const c = overlay.querySelector('[data-close="mem"]'); if(c) c.focus(); }, 0);
+    }
+
+    function closeMemory(){
+      overlay.classList.remove("show");
+      overlay.setAttribute("aria-hidden", "true");
+      activeMemory = null;
+      thumbs.innerHTML = "";
+      bigimg.removeAttribute("src");
+    }
+
+    $$('[data-close="mem"]').forEach(btn => btn.addEventListener("click", closeMemory));
+
+    function validImagesFor(mem){
+      const arr = (IMAGES[mem] || []).filter(Boolean);
+      return arr.length ? arr : ["data:image/svg+xml;charset=utf-8," + encodeURIComponent(placeholderSvg(mem))];
+    }
+
+    function placeholderSvg(mem){
+      const label = (MEMORY_META[mem]?.title || mem || "Memory").toUpperCase();
+      return `
+        <svg xmlns='http://www.w3.org/2000/svg' width='1400' height='900'>
+          <defs>
+            <linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
+              <stop offset='0' stop-color='rgba(255,94,168,.75)'/>
+              <stop offset='1' stop-color='rgba(124,92,255,.75)'/>
+            </linearGradient>
+          </defs>
+          <rect width='100%' height='100%' fill='url(#g)'/>
+          <text x='50%' y='48%' dominant-baseline='middle' text-anchor='middle'
+            font-family='${varFont()}' font-size='56' fill='rgba(255,255,255,.92)'>
+            ADD PHOTOS
+          </text>
+          <text x='50%' y='56%' dominant-baseline='middle' text-anchor='middle'
+            font-family='${varFont()}' font-size='30' fill='rgba(255,255,255,.82)'>
+            images/${mem}-1.jpg
+          </text>
+          <text x='50%' y='64%' dominant-baseline='middle' text-anchor='middle'
+            font-family='${varFont()}' font-size='26' fill='rgba(255,255,255,.76)'>
+            (${label})
+          </text>
+        </svg>
+      `.trim();
+    }
+
+    function varFont(){
+      return "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+    }
+
+    function buildThumbs(){
+      const imgs = validImagesFor(activeMemory);
+      thumbs.innerHTML = "";
+      imgs.forEach((src, idx) => {
+        const b = document.createElement("button");
+        b.className = "thumb";
+        b.type = "button";
+        b.setAttribute("aria-label", `Select photo ${idx+1}`);
+        b.innerHTML = `<img alt="Thumbnail ${idx+1}" loading="lazy" src="${src}">`;
+        b.addEventListener("click", () => showImage(idx));
+        thumbs.appendChild(b);
+      });
+    }
+
+    function showImage(i){
+      const imgs = validImagesFor(activeMemory);
+      activeIndex = (i + imgs.length) % imgs.length;
+      const src = imgs[activeIndex];
+
+      // Update big image with a tiny fade
+      bigimg.style.opacity = "0";
+      setTimeout(() => {
+        bigimg.src = src;
+        bigimg.onload = () => { bigimg.style.opacity = "1"; };
+        bigimg.onerror = () => {
+          // If an image path is wrong, fallback to placeholder for this memory
+          bigimg.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(placeholderSvg(activeMemory));
+          bigimg.style.opacity = "1";
+        };
+      }, 60);
+
+      // Update counter and thumbnail current state
+      counter.textContent = `${activeIndex + 1} / ${imgs.length}`;
+      $$(".thumb", thumbs).forEach((t, idx) => t.setAttribute("aria-current", idx === activeIndex ? "true" : "false"));
+    }
+
+    prevBtn.addEventListener("click", () => showImage(activeIndex - 1));
+    nextBtn.addEventListener("click", () => showImage(activeIndex + 1));
+
+    // Open from cards
+    $$(".card").forEach(card => {
+      const mem = card.getAttribute("data-memory");
+      card.addEventListener("click", (e) => {
+        // if click originates from inner button, handle there
+        const openBtn = e.target.closest("button[data-open]");
+        if(openBtn) return;
+        openMemory(mem);
+      });
+      card.addEventListener("keydown", (e) => {
+        if(e.key === "Enter" || e.key === " "){
+          e.preventDefault();
+          openMemory(mem);
+        }
+      });
+    });
+
+    $$('button[data-open]').forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        openMemory(btn.getAttribute("data-open"));
+      });
+    });
+
+    // Close on overlay click (outside modal)
+    [overlay, loveOverlay].forEach(ov => {
+      ov.addEventListener("click", (e) => {
+        if(e.target === ov){
+          if(ov === overlay) closeMemory();
+          else closeLoveNote();
+        }
+      });
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener("keydown", (e) => {
+      if(e.key === "Escape"){
+        if(overlay.classList.contains("show")) closeMemory();
+        if(loveOverlay.classList.contains("show")) closeLoveNote();
+      }
+      if(overlay.classList.contains("show")){
+        if(e.key === "ArrowLeft") showImage(activeIndex - 1);
+        if(e.key === "ArrowRight") showImage(activeIndex + 1);
+      }
+    });
+
+    // Swipe on big image (mobile)
+    let touchStartX = null;
+    bigimg.addEventListener("touchstart", (e) => {
+      touchStartX = e.touches?.[0]?.clientX ?? null;
+    }, {passive:true});
+    bigimg.addEventListener("touchend", (e) => {
+      if(touchStartX === null) return;
+      const endX = e.changedTouches?.[0]?.clientX ?? null;
+      if(endX === null) return;
+      const dx = endX - touchStartX;
+      const threshold = 35;
+      if(Math.abs(dx) > threshold){
+        if(dx > 0) showImage(activeIndex - 1);
+        else showImage(activeIndex + 1);
+      }
+      touchStartX = null;
+    }, {passive:true});
+  </script>
+</body>
+</html>
